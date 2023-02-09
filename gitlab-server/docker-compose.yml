@@ -3,10 +3,10 @@ services:
   web:
     image: 'gitlab/gitlab-ee:latest'
     restart: always
-    hostname: 'gitlab.example.com'
+    hostname: '10.1.1.53'
     environment:
       GITLAB_OMNIBUS_CONFIG: |
-        external_url 'https://gitlab.example.com'
+        external_url 'http://10.1.1.53'
         # Add any other gitlab.rb configuration here, each on its own line
     ports:
       - '80:80'
