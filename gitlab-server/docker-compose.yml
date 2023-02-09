@@ -4,9 +4,10 @@ services:
     image: 'gitlab/gitlab-ee:latest'
     restart: always
     hostname: '10.1.1.53'
+    container_name: hussein-gitlab
     environment:
       GITLAB_OMNIBUS_CONFIG: |
-        external_url 'http://10.1.1.53'
+        external_url 'http://hussein.sne.com'
         # Add any other gitlab.rb configuration here, each on its own line
     ports:
       - '80:80'
