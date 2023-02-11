@@ -23,7 +23,7 @@ services:
 
   # web container, with django + gunicorn
   djangoapp:
-    build: .
+    image: ha33ona/python:latest
     environment:
       - DJANGO_SETTINGS_MODULE
     volumes:
