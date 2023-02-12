@@ -116,4 +116,4 @@ deploy-prod-dev:
     - dev
   tags:
     - hussein-runner
-###################### [END] MAIN BRANCH PIPELINE ###########################
+###################### [END] DEV BRANCH PIPELINE ###########################
