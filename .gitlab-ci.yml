@@ -20,6 +20,7 @@ build:
 
 unit_test:
   image: docker:latest
+  needs: [build]
   stage: test
   script:
     - cd hussein-repo
@@ -30,6 +31,7 @@ unit_test:
 
 release-image:
   image: docker:latest
+  needs: [unit_test]
   stage: release
   script:
     - cd hussein-repo
@@ -41,6 +43,7 @@ release-image:
 
 deploy-staging:
   stage: deploy
+  needs: [release-image]
   script:
     - echo "Deploy to staging server"
   environment:
@@ -53,6 +56,7 @@ deploy-staging:
 
 deploy-prod:
   stage: deploy
+  needs: [release-image]
   script:
     - cd hussein-repo
     - ansible-playbook ansible/playbooks/04_Deploy-Stage.yml -i ansible/inventory/hosts --private-key=ansible/files/id_rsa
@@ -75,6 +79,7 @@ build-dev:
 
 unit_test-dev:
   image: docker:latest
+  needs: [build-dev]
   stage: test
   script:
     - cd hussein-repo
@@ -86,6 +91,7 @@ unit_test-dev:
 
 release-image-dev:
   image: docker:latest
+  needs: [unit_test-dev]
   stage: release
   script:
     - cd hussein-repo
@@ -97,6 +103,7 @@ release-image-dev:
 
 deploy-staging-dev:
   stage: deploy
+  needs: [release-image-dev]
   script:
     - echo "Deploy to staging server"
   environment:
@@ -109,6 +116,7 @@ deploy-staging-dev:
 
 deploy-prod-dev:
   stage: deploy
+  needs: [release-image-dev]
   script:
     - cd hussein-repo
     - ansible-playbook ansible/playbooks/04_Deploy-Stage.yml -i ansible/inventory/hosts --private-key=ansible/files/id_rsa
