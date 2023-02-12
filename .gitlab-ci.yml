@@ -3,7 +3,7 @@ stages:
   - test
   - release
   - deploy
-# update deploy stage #9
+# with ansible
 variables:
   CONTAINER_COMPOSE_IMAGE: hello_djangoapp
   CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
@@ -12,12 +12,9 @@ variables:
 build:
   image: docker:latest
   stage: build
-  before_script:
-    - docker login -u ha33ona -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
-    - docker build --pull -t $CONTAINER_TEST_IMAGE .
-    - docker tag $CONTAINER_TEST_IMAGE ha33ona/$CONTAINER_TEST_IMAGE
-    - docker push ha33ona/$CONTAINER_TEST_IMAGE
+    - cd hussein-repo
+    - ansible-playbook ansible/playbooks/01_Build-Stage.yml -i ansible/inventory/hosts --private-key=ansible/files/id_rsa
   tags:
     - hussein-runner
 
@@ -25,16 +22,8 @@ unit_test:
   image: docker:latest
   stage: test
   script:
-    - docker pull ha33ona/$CONTAINER_TEST_IMAGE
-    - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_COMPOSE_IMAGE
-    - make test
-    - echo $SUDO_PASS | sudo -S rm -rf .tox
-    - echo $SUDO_PASS | sudo -S rm -rf __pycache__
-    - echo $SUDO_PASS | sudo -S rm -rf hello.egg-info
-    - echo $SUDO_PASS | sudo -S rm -rf hello
-    - echo $SUDO_PASS | sudo -S rm -rf tests
-    - pwd
-    - ls -la
+    - cd hussein-repo
+    - ansible-playbook ansible/playbooks/02_Test-Stage.yml -i ansible/inventory/hosts --private-key=ansible/files/id_rsa
 
   tags:
     - hussein-runner
@@ -42,12 +31,9 @@ unit_test:
 release-image:
   image: docker:latest
   stage: release
-  before_script:
-    - docker login -u ha33ona -p $CI_JOB_TOKEN $CI_REGISTRY
   script:
-    - docker pull ha33ona/$CONTAINER_TEST_IMAGE
-    - docker tag ha33ona/$CONTAINER_TEST_IMAGE ha33ona/$CONTAINER_RELEASE_IMAGE
-    - docker push ha33ona/$CONTAINER_RELEASE_IMAGE
+    - cd hussein-repo
+    - ansible-playbook ansible/playbooks/03_Release-Stage.yml -i ansible/inventory/hosts --private-key=ansible/files/id_rsa
   only:
     - main
   tags:
@@ -68,12 +54,8 @@ deploy-staging:
 deploy-prod:
   stage: deploy
   script:
-    - ssh -o StrictHostKeyChecking=no hussein@10.1.1.56 "
-        docker login -u ha33ona -p $CI_JOB_TOKEN $CI_REGISTRY &&
-        git clone http://gitlab-ci-tokne:$REPO_TOKEN@hussein.sne.com/gitlab-instance-610d8aec/hussein-repo.git &&
-        ls &&
-        cd hussein-repo &&
-        docker-compose up -d"
+    - cd hussein-repo
+    - ansible-playbook ansible/playbooks/04_Deploy-Stage.yml -i ansible/inventory/hosts --private-key=ansible/files/id_rsa
   only:
     - main
   tags:

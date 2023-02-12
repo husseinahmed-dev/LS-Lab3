@@ -4,3 +4,4 @@ __pycache__/
 .tox/
 .coverage*
 .pytest_cache/
+ansible/files/id_rsa
